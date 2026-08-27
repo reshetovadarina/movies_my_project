@@ -1,0 +1,10 @@
+body.dark {
+  background-color: #1e1e24;
+  color: #ffffff;
+}
+
+#movie-list li.watched {
+  text-decoration: line-through;
+  color: #7f8c8d;
+  background-color: #e8f4fd;
+}

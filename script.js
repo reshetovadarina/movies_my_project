@@ -15,13 +15,39 @@ const searchButton = document.getElementById('search-button');
 const searchResult = document.getElementById('search-result');
 const clearButton = document.getElementById('clear-button');
 
-function renderMovies() {
+function toggleTheme() {
+    document.body.classList.toggle('dark');
+}
+
+function markWatched(card) {
+    card.classList.toggle('watched');
+}
+
+function applyCardStyles(card) {
+    Object.assign(card.style, {
+        backgroundColor: "#e9ecef",
+        padding: "10px",
+        marginBottom: "5px",
+        borderRadius: "5px",
+        borderLeft: "4px solid #db347c"
+    });
+}
+
+function renderMovie() {
     movieList.replaceChildren();
     heading.textContent = "Мої улюблені фільми (" + movies.length + ")";
+
     movies.forEach(movie => {
         const li = document.createElement('li');
         li.textContent = movie.title + " (" + movie.year + ")";
         li.setAttribute('data-id', movie.id);
+
+        if (movie.watched) {
+            li.classList.add('watched');
+        }
+
+        applyCardStyles(li);
+
         movieList.appendChild(li);
     });
 }
@@ -42,7 +68,7 @@ function addMovie() {
 
         movies.push(newMovie);
         movieInput.value = "";
-        renderMovies();
+        renderMovie();
 
         const countAfter = document.querySelectorAll('#movie-list li').length;
         console.log("Кількість карток ПІСЛЯ додавання:", countAfter);
@@ -68,11 +94,17 @@ function searchMovie() {
 
 function clearList() {
     movies = [];
-    renderMovies();
+    renderMovie();
 }
 
 addButton.onclick = addMovie;
 searchButton.onclick = searchMovie;
 clearButton.onclick = clearList;
 
-renderMovies();
+renderMovie();
+toggleTheme();
+
+const firstCard = document.querySelector('#movie-list li');
+if (firstCard) {
+    markWatched(firstCard);
+}
