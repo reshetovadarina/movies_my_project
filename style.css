@@ -1,10 +1,23 @@
+#movie-list {
+  padding: 0;
+  margin: 20px 0;
+}
+
+#movie-list li {
+  padding: 10px;
+  margin-bottom: 5px;
+  list-style-type: none;
+  cursor: pointer;
+  background-color: #f0f0f0;
+}
+
 body.dark {
   background-color: #1e1e24;
-  color: #ffffff;
+  color: #000000;
 }
 
 #movie-list li.watched {
   text-decoration: line-through;
-  color: #7f8c8d;
-  background-color: #e8f4fd;
+  color: #000000;
+  background-color: #f970bb;
 }

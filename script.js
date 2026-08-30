@@ -9,35 +9,22 @@ const heading = document.querySelector('h1');
 const movieList = document.getElementById('movie-list');
 const movieInput = document.getElementById('movie-input');
 const addButton = document.getElementById('add-button');
-
 const searchInput = document.getElementById('search-input');
-const searchButton = document.getElementById('search-button');
-const searchResult = document.getElementById('search-result');
 const clearButton = document.getElementById('clear-button');
-
-function toggleTheme() {
-    document.body.classList.toggle('dark');
-}
+const themeButton = document.getElementById('theme-button');
+const counter = document.getElementById('counter');
 
 function markWatched(card) {
     card.classList.toggle('watched');
 }
 
-function applyCardStyles(card) {
-    Object.assign(card.style, {
-        backgroundColor: "#e9ecef",
-        padding: "10px",
-        marginBottom: "5px",
-        borderRadius: "5px",
-        borderLeft: "4px solid #db347c"
-    });
-}
-
-function renderMovie() {
+function renderMovie(moviesToRender = movies) {
     movieList.replaceChildren();
     heading.textContent = "Мої улюблені фільми (" + movies.length + ")";
+    const watchedCount = movies.filter(movie => movie.watched).length;
+    counter.textContent = "Переглянуто: " + watchedCount + " з " + movies.length;
 
-    movies.forEach(movie => {
+    moviesToRender.forEach(movie => {
         const li = document.createElement('li');
         li.textContent = movie.title + " (" + movie.year + ")";
         li.setAttribute('data-id', movie.id);
@@ -45,8 +32,6 @@ function renderMovie() {
         if (movie.watched) {
             li.classList.add('watched');
         }
-
-        applyCardStyles(li);
 
         movieList.appendChild(li);
     });
@@ -56,9 +41,6 @@ function addMovie() {
     const titleText = movieInput.value;
 
     if (titleText !== "") {
-        const countBefore = document.querySelectorAll('#movie-list li').length;
-        console.log("Кількість карток до додавання:", countBefore);
-
         const newMovie = {
             id: Date.now(),
             title: titleText,
@@ -68,43 +50,45 @@ function addMovie() {
 
         movies.push(newMovie);
         movieInput.value = "";
+        searchInput.value = "";
         renderMovie();
-
-        const countAfter = document.querySelectorAll('#movie-list li').length;
-        console.log("Кількість карток ПІСЛЯ додавання:", countAfter);
-    }
-}
-
-function searchMovie() {
-    const query = searchInput.value;
-    let foundMovie = null;
-
-    movies.forEach(movie => {
-        if (movie.title.includes(query)) {
-            foundMovie = movie;
-        }
-    });
-
-    if (foundMovie !== null) {
-        searchResult.textContent = foundMovie.title + " (" + foundMovie.year + ")";
-    } else {
-        searchResult.textContent = "Нічого не знайдено";
     }
 }
 
 function clearList() {
     movies = [];
+    searchInput.value = "";
     renderMovie();
 }
 
-addButton.onclick = addMovie;
-searchButton.onclick = searchMovie;
-clearButton.onclick = clearList;
-
-renderMovie();
-toggleTheme();
-
-const firstCard = document.querySelector('#movie-list li');
-if (firstCard) {
-    markWatched(firstCard);
+function toggleTheme() {
+    document.body.classList.toggle('dark');
 }
+
+themeButton.addEventListener('click', toggleTheme);
+addButton.addEventListener('click', addMovie);
+clearButton.addEventListener('click', clearList);
+
+searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase();
+    const filteredMovies = movies.filter(movie =>
+        movie.title.toLowerCase().includes(query)
+    );
+    renderMovie(filteredMovies);
+});
+movieList.addEventListener('click', event => {
+    if (event.target.tagName === 'LI') {
+        const clickedCard = event.target;
+        const clickedId = Number(clickedCard.getAttribute('data-id'));
+
+        movies.forEach(movie => {
+            if (movie.id === clickedId) {
+                movie.watched = !movie.watched;
+            }
+        });
+
+        markWatched(clickedCard);
+        renderMovie();
+    }
+});
+renderMovie();
