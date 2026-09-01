@@ -20,19 +20,30 @@ function markWatched(card) {
 
 function renderMovie(moviesToRender = movies) {
     movieList.replaceChildren();
+
     heading.textContent = "Мої улюблені фільми (" + movies.length + ")";
     const watchedCount = movies.filter(movie => movie.watched).length;
     counter.textContent = "Переглянуто: " + watchedCount + " з " + movies.length;
 
     moviesToRender.forEach(movie => {
         const li = document.createElement('li');
-        li.textContent = movie.title + " (" + movie.year + ")";
+        li.textContent = movie.title + " (" + movie.year + ") ";
         li.setAttribute('data-id', movie.id);
 
         if (movie.watched) {
             li.classList.add('watched');
         }
 
+        const watchBtn = document.createElement('button');
+        watchBtn.textContent = "Переглянуто";
+        watchBtn.classList.add('watched-btn');
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = "Видалити";
+        deleteBtn.classList.add('delete-btn');
+
+        li.appendChild(watchBtn);
+        li.appendChild(deleteBtn);
         movieList.appendChild(li);
     });
 }
@@ -76,20 +87,33 @@ searchInput.addEventListener('input', () => {
     );
     renderMovie(filteredMovies);
 });
-movieList.addEventListener('click', event => {
-    if (event.target.tagName === 'LI') {
-        const clickedCard = event.target;
-        const clickedId = Number(clickedCard.getAttribute('data-id'));
 
+movieList.addEventListener('click', event => {
+    const parentLi = event.target.parentElement;
+    if (!parentLi) return;
+
+    const clickedId = Number(parentLi.getAttribute('data-id'));
+
+    if (event.target.classList.contains('delete-btn')) {
+        movies = movies.filter(movie => movie.id !== clickedId);
+        parentLi.remove();
+
+        heading.textContent = "Мої улюблені фільми (" + movies.length + ")";
+        const watchedCount = movies.filter(movie => movie.watched).length;
+        counter.textContent = "Переглянуто: " + watchedCount + " з " + movies.length;
+    }
+    else if (event.target.classList.contains('watched-btn')) {
         movies.forEach(movie => {
             if (movie.id === clickedId) {
                 movie.watched = !movie.watched;
             }
         });
 
-        markWatched(clickedCard);
-       const watchedCount = movies.filter(movie => movie.watched).length;
-      counter.textContent = "Переглянуто: " + watchedCount + " з " + movies.length;
+        markWatched(parentLi);
+
+        const watchedCount = movies.filter(movie => movie.watched).length;
+        counter.textContent = "Переглянуто: " + watchedCount + " з " + movies.length;
     }
 });
+
 renderMovie();
