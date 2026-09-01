@@ -88,7 +88,8 @@ movieList.addEventListener('click', event => {
         });
 
         markWatched(clickedCard);
-        renderMovie();
+       const watchedCount = movies.filter(movie => movie.watched).length;
+      counter.textContent = "Переглянуто: " + watchedCount + " з " + movies.length;
     }
 });
 renderMovie();

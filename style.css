@@ -12,12 +12,22 @@
 }
 
 body.dark {
-  background-color: #1e1e24;
-  color: #000000;
+  background-color: #000000;
+  color: #ffffff;
+}
+
+body.dark #movie-list li {
+  background-color: #cfb5c2;
+  color: #ffffff;
 }
 
 #movie-list li.watched {
   text-decoration: line-through;
   color: #000000;
-  background-color: #f970bb;
+  background-color: #aa2c71;
+}
+
+body.dark #movie-list li.watched {
+  background-color: #aa2c71;
+  color: #ffffff;
 }
