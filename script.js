@@ -42,8 +42,14 @@ function renderMovie(moviesToRender = movies) {
         deleteBtn.textContent = "Видалити";
         deleteBtn.classList.add('delete-btn');
 
+        const detailsLink = document.createElement('a');
+        detailsLink.textContent = "Детальніше";
+        detailsLink.setAttribute('href', '#');
+        detailsLink.classList.add('details-link');
+
         li.appendChild(watchBtn);
         li.appendChild(deleteBtn);
+        li.appendChild(detailsLink);
         movieList.appendChild(li);
     });
 }
@@ -89,6 +95,18 @@ searchInput.addEventListener('input', () => {
 });
 
 movieList.addEventListener('click', event => {
+      if (event.target.classList.contains('details-link')) {
+        event.preventDefault();
+
+        const parentLi = event.target.parentElement;
+        const clickedId = Number(parentLi.getAttribute('data-id'));
+        const currentMovie = movies.find(movie => movie.id === clickedId);
+
+        if (currentMovie) {
+            searchResult.textContent = `ID: ${currentMovie.id} | Назва: ${currentMovie.title} | Рік: ${currentMovie.year} | Статус: ${currentMovie.watched ? "Переглянуто" : "Ще ні"}`;
+        }
+        return;
+    }
     const parentLi = event.target.parentElement;
     if (!parentLi) return;
 
