@@ -13,6 +13,7 @@ const searchInput = document.getElementById('search-input');
 const clearButton = document.getElementById('clear-button');
 const themeButton = document.getElementById('theme-button');
 const counter = document.getElementById('counter');
+const searchResult = document.getElementById('search-result');
 
 function markWatched(card) {
     card.classList.toggle('watched');
@@ -86,6 +87,18 @@ themeButton.addEventListener('click', toggleTheme);
 addButton.addEventListener('click', addMovie);
 clearButton.addEventListener('click', clearList);
 
+movieInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+        addMovie();
+    }
+});
+
+window.addEventListener('keydown', event => {
+    if (event.key.toLowerCase() === 'd' && event.target.tagName !== 'INPUT') {
+        toggleTheme();
+    }
+});
+
 searchInput.addEventListener('input', () => {
     const query = searchInput.value.toLowerCase();
     const filteredMovies = movies.filter(movie =>
@@ -95,7 +108,7 @@ searchInput.addEventListener('input', () => {
 });
 
 movieList.addEventListener('click', event => {
-      if (event.target.classList.contains('details-link')) {
+    if (event.target.classList.contains('details-link')) {
         event.preventDefault();
 
         const parentLi = event.target.parentElement;
@@ -107,6 +120,7 @@ movieList.addEventListener('click', event => {
         }
         return;
     }
+
     const parentLi = event.target.parentElement;
     if (!parentLi) return;
 

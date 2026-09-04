@@ -2,25 +2,29 @@
 <html lang="uk">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <button id="theme-button">Змінити тему</button>
 
-    <h1>Список улюблених фільмів</h1>
+    <h1>Мої улюблені фільми</h1>
     <p id="counter"></p>
 
     <div id="app">
       <input type="text" id="movie-input" placeholder="Введіть назву фільму" />
       <button id="add-button">Додати</button>
 
-      <input type="text" id="search-input" placeholder="Пошук" />
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Швидкий пошук фільму..."
+      />
 
-      <button id="clear-button">Очистити</button>
+      <button id="clear-button">Очистити список</button>
 
       <ul id="movie-list"></ul>
+      <div id="search-result"></div>
     </div>
 
     <script src="script.js"></script>
