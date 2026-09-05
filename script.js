@@ -19,39 +19,50 @@ function markWatched(card) {
     card.classList.toggle('watched');
 }
 
-function renderMovie(moviesToRender = movies) {
-    movieList.replaceChildren();
-
+// Функція для відображення кількості фільмів
+function updateCounters() {
     heading.textContent = "Мої улюблені фільми (" + movies.length + ")";
     const watchedCount = movies.filter(movie => movie.watched).length;
     counter.textContent = "Переглянуто: " + watchedCount + " з " + movies.length;
+}
+
+// 2. Функція для створення картки з фільмом
+function createMovieCard(movie) {
+    const li = document.createElement('li');
+    li.textContent = movie.title + " (" + movie.year + ") ";
+    li.setAttribute('data-id', movie.id);
+
+    if (movie.watched) {
+        li.classList.add('watched');
+    }
+
+    const watchBtn = document.createElement('button');
+    watchBtn.textContent = "Переглянуто";
+    watchBtn.classList.add('watched-btn');
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = "Видалити";
+    deleteBtn.classList.add('delete-btn');
+
+    const detailsLink = document.createElement('a');
+    detailsLink.textContent = "Детальніше";
+    detailsLink.setAttribute('href', '#');
+    detailsLink.classList.add('details-link');
+
+    li.appendChild(watchBtn);
+    li.appendChild(deleteBtn);
+    li.appendChild(detailsLink);
+
+    return li;
+}
+
+function renderMovie(moviesToRender = movies) {
+    movieList.replaceChildren();
+    updateCounters();
 
     moviesToRender.forEach(movie => {
-        const li = document.createElement('li');
-        li.textContent = movie.title + " (" + movie.year + ") ";
-        li.setAttribute('data-id', movie.id);
-
-        if (movie.watched) {
-            li.classList.add('watched');
-        }
-
-        const watchBtn = document.createElement('button');
-        watchBtn.textContent = "Переглянуто";
-        watchBtn.classList.add('watched-btn');
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = "Видалити";
-        deleteBtn.classList.add('delete-btn');
-
-        const detailsLink = document.createElement('a');
-        detailsLink.textContent = "Детальніше";
-        detailsLink.setAttribute('href', '#');
-        detailsLink.classList.add('details-link');
-
-        li.appendChild(watchBtn);
-        li.appendChild(deleteBtn);
-        li.appendChild(detailsLink);
-        movieList.appendChild(li);
+        const card = createMovieCard(movie);
+        movieList.appendChild(card);
     });
 }
 
@@ -83,6 +94,32 @@ function toggleTheme() {
     document.body.classList.toggle('dark');
 }
 
+// 3. Функція для рендеру деталей фільму
+function showMovieDetails(id) {
+    const currentMovie = movies.find(movie => movie.id === id);
+    if (currentMovie) {
+        searchResult.textContent = `ID: ${currentMovie.id} | Назва: ${currentMovie.title} | Рік: ${currentMovie.year} | Статус: ${currentMovie.watched ? "Переглянуто" : "Ще ні"}`;
+    }
+}
+
+// 4.Функція для видалення фільму з масиву та DOM
+function deleteMovie(card, id) {
+    movies = movies.filter(movie => movie.id !== id);
+    card.remove();
+    updateCounters();
+}
+
+// 5. Функція для зміни статусу перегляду фільму
+function toggleMovieWatched(card, id) {
+    movies.forEach(movie => {
+        if (movie.id === id) {
+            movie.watched = !movie.watched;
+        }
+    });
+    markWatched(card);
+    updateCounters();
+}
+
 themeButton.addEventListener('click', toggleTheme);
 addButton.addEventListener('click', addMovie);
 clearButton.addEventListener('click', clearList);
@@ -110,14 +147,8 @@ searchInput.addEventListener('input', () => {
 movieList.addEventListener('click', event => {
     if (event.target.classList.contains('details-link')) {
         event.preventDefault();
-
         const parentLi = event.target.parentElement;
-        const clickedId = Number(parentLi.getAttribute('data-id'));
-        const currentMovie = movies.find(movie => movie.id === clickedId);
-
-        if (currentMovie) {
-            searchResult.textContent = `ID: ${currentMovie.id} | Назва: ${currentMovie.title} | Рік: ${currentMovie.year} | Статус: ${currentMovie.watched ? "Переглянуто" : "Ще ні"}`;
-        }
+        showMovieDetails(Number(parentLi.getAttribute('data-id')));
         return;
     }
 
@@ -127,24 +158,10 @@ movieList.addEventListener('click', event => {
     const clickedId = Number(parentLi.getAttribute('data-id'));
 
     if (event.target.classList.contains('delete-btn')) {
-        movies = movies.filter(movie => movie.id !== clickedId);
-        parentLi.remove();
-
-        heading.textContent = "Мої улюблені фільми (" + movies.length + ")";
-        const watchedCount = movies.filter(movie => movie.watched).length;
-        counter.textContent = "Переглянуто: " + watchedCount + " з " + movies.length;
+        deleteMovie(parentLi, clickedId);
     }
     else if (event.target.classList.contains('watched-btn')) {
-        movies.forEach(movie => {
-            if (movie.id === clickedId) {
-                movie.watched = !movie.watched;
-            }
-        });
-
-        markWatched(parentLi);
-
-        const watchedCount = movies.filter(movie => movie.watched).length;
-        counter.textContent = "Переглянуто: " + watchedCount + " з " + movies.length;
+        toggleMovieWatched(parentLi, clickedId);
     }
 });
 
