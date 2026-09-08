@@ -1,9 +1,8 @@
-let movies = [
-    { id: 1, title: "Зелена книга", year: 2018, genre: "Драма", watched: false },
-    { id: 2, title: "Сам удома", year: 1990, genre: "Комедія", watched: false },
-    { id: 3, title: "Гаррі Поттер", year: 2001, genre: "Фантастика", watched: false },
-    { id: 4, title: "Містер і місіс Сміт", year: 2005, genre: "Бойовик", watched: false }
-];
+import defaultMovies from './movies.js';
+import { generateId, formatMovie } from './helpers.js';
+import { isValidYear } from './validation.js';
+
+let movies = defaultMovies;
 
 const heading = document.querySelector('h1');
 const movieList = document.getElementById('movie-list');
@@ -35,7 +34,7 @@ function updateCounters() {
 
 function createMovieCard(movie) {
     const li = document.createElement('li');
-    li.textContent = movie.title + " (" + movie.year + ") [" + movie.genre + "] ";
+    li.textContent = formatMovie(movie) + " [" + movie.genre + "] ";
     li.setAttribute('data-id', movie.id);
 
     if (movie.watched) {
@@ -104,6 +103,7 @@ function toggleMovieWatched(card, id) {
     markWatched(card);
     updateCounters();
 }
+
 movieForm.addEventListener('submit', event => {
     event.preventDefault();
 
@@ -121,7 +121,7 @@ movieForm.addEventListener('submit', event => {
         isFormValid = false;
     }
 
-    if (!movieYear.value || yearValue < 1900 || yearValue > currentYear) {
+    if (!movieYear.value || !isValidYear(yearValue)) {
         yearError.textContent = "Рік має бути в діапазоні від 1900 до " + currentYear;
         isFormValid = false;
     }
@@ -131,7 +131,7 @@ movieForm.addEventListener('submit', event => {
     }
 
     const newMovie = {
-        id: Date.now(),
+        id: generateId(),
         title: titleText,
         year: yearValue,
         genre: movieGenre.value,
