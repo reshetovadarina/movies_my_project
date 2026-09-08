@@ -1,14 +1,22 @@
 let movies = [
-    { id: 1, title: "Зелена книга", year: 2018, watched: false },
-    { id: 2, title: "Сам удома", year: 1990, watched: false },
-    { id: 3, title: "Гаррі Поттер", year: 2001, watched: false },
-    { id: 4, title: "Містер і місіс Сміт", year: 2005, watched: false }
+    { id: 1, title: "Зелена книга", year: 2018, genre: "Драма", watched: false },
+    { id: 2, title: "Сам удома", year: 1990, genre: "Комедія", watched: false },
+    { id: 3, title: "Гаррі Поттер", year: 2001, genre: "Фантастика", watched: false },
+    { id: 4, title: "Містер і місіс Сміт", year: 2005, genre: "Бойовик", watched: false }
 ];
 
 const heading = document.querySelector('h1');
 const movieList = document.getElementById('movie-list');
+const movieForm = document.getElementById('movie-form');
+
 const movieInput = document.getElementById('movie-input');
-const addButton = document.getElementById('add-button');
+const movieYear = document.getElementById('movie-year');
+const movieGenre = document.getElementById('movie-genre');
+const movieWatched = document.getElementById('movie-watched');
+
+const titleError = document.getElementById('title-error');
+const yearError = document.getElementById('year-error');
+
 const searchInput = document.getElementById('search-input');
 const clearButton = document.getElementById('clear-button');
 const themeButton = document.getElementById('theme-button');
@@ -19,17 +27,15 @@ function markWatched(card) {
     card.classList.toggle('watched');
 }
 
-// Функція для відображення кількості фільмів
 function updateCounters() {
     heading.textContent = "Мої улюблені фільми (" + movies.length + ")";
     const watchedCount = movies.filter(movie => movie.watched).length;
     counter.textContent = "Переглянуто: " + watchedCount + " з " + movies.length;
 }
 
-// 2. Функція для створення картки з фільмом
 function createMovieCard(movie) {
     const li = document.createElement('li');
-    li.textContent = movie.title + " (" + movie.year + ") ";
+    li.textContent = movie.title + " (" + movie.year + ") [" + movie.genre + "] ";
     li.setAttribute('data-id', movie.id);
 
     if (movie.watched) {
@@ -66,24 +72,6 @@ function renderMovie(moviesToRender = movies) {
     });
 }
 
-function addMovie() {
-    const titleText = movieInput.value;
-
-    if (titleText !== "") {
-        const newMovie = {
-            id: Date.now(),
-            title: titleText,
-            year: 2026,
-            watched: false
-        };
-
-        movies.push(newMovie);
-        movieInput.value = "";
-        searchInput.value = "";
-        renderMovie();
-    }
-}
-
 function clearList() {
     movies = [];
     searchInput.value = "";
@@ -94,22 +82,19 @@ function toggleTheme() {
     document.body.classList.toggle('dark');
 }
 
-// 3. Функція для рендеру деталей фільму
 function showMovieDetails(id) {
     const currentMovie = movies.find(movie => movie.id === id);
     if (currentMovie) {
-        searchResult.textContent = `ID: ${currentMovie.id} | Назва: ${currentMovie.title} | Рік: ${currentMovie.year} | Статус: ${currentMovie.watched ? "Переглянуто" : "Ще ні"}`;
+        searchResult.textContent = `ID: ${currentMovie.id} | Назва: ${currentMovie.title} | Рік: ${currentMovie.year} | Жанр: ${currentMovie.genre} | Статус: ${currentMovie.watched ? "Переглянуто" : "Ще ні"}`;
     }
 }
 
-// 4.Функція для видалення фільму з масиву та DOM
 function deleteMovie(card, id) {
     movies = movies.filter(movie => movie.id !== id);
     card.remove();
     updateCounters();
 }
 
-// 5. Функція для зміни статусу перегляду фільму
 function toggleMovieWatched(card, id) {
     movies.forEach(movie => {
         if (movie.id === id) {
@@ -119,16 +104,50 @@ function toggleMovieWatched(card, id) {
     markWatched(card);
     updateCounters();
 }
+movieForm.addEventListener('submit', event => {
+    event.preventDefault();
+
+    const titleText = movieInput.value.trim();
+    const yearValue = Number(movieYear.value);
+    const currentYear = new Date().getFullYear();
+
+    titleError.textContent = "";
+    yearError.textContent = "";
+
+    let isFormValid = true;
+
+    if (titleText === "") {
+        titleError.textContent = "Назва фільму не може бути порожньою";
+        isFormValid = false;
+    }
+
+    if (!movieYear.value || yearValue < 1900 || yearValue > currentYear) {
+        yearError.textContent = "Рік має бути в діапазоні від 1900 до " + currentYear;
+        isFormValid = false;
+    }
+
+    if (!isFormValid) {
+        return;
+    }
+
+    const newMovie = {
+        id: Date.now(),
+        title: titleText,
+        year: yearValue,
+        genre: movieGenre.value,
+        watched: movieWatched.checked
+    };
+
+    movies.push(newMovie);
+
+    movieForm.reset();
+    movieYear.value = "2026";
+    searchInput.value = "";
+    renderMovie();
+});
 
 themeButton.addEventListener('click', toggleTheme);
-addButton.addEventListener('click', addMovie);
 clearButton.addEventListener('click', clearList);
-
-movieInput.addEventListener('keydown', event => {
-    if (event.key === 'Enter') {
-        addMovie();
-    }
-});
 
 window.addEventListener('keydown', event => {
     if (event.key.toLowerCase() === 'd' && event.target.tagName !== 'INPUT') {
