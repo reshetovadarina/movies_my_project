@@ -21,6 +21,7 @@ const clearButton = document.getElementById('clear-button');
 const themeButton = document.getElementById('theme-button');
 const counter = document.getElementById('counter');
 const searchResult = document.getElementById('search-result');
+const toast = document.getElementById('toast');
 
 function markWatched(card) {
     card.classList.toggle('watched');
@@ -30,6 +31,13 @@ function updateCounters() {
     heading.textContent = "Мої улюблені фільми (" + movies.length + ")";
     const watchedCount = movies.filter(movie => movie.watched).length;
     counter.textContent = "Переглянуто: " + watchedCount + " з " + movies.length;
+}
+
+function showToast() {
+    toast.textContent = "Фільм додано";
+    setTimeout(() => {
+        toast.textContent = "";
+    }, 2000);
 }
 
 function createMovieCard(movie) {
@@ -88,6 +96,14 @@ function showMovieDetails(id) {
     }
 }
 
+function debounce(fn, delay) {
+    let timer;
+    return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), delay);
+    };
+}
+
 function deleteMovie(card, id) {
     movies = movies.filter(movie => movie.id !== id);
     card.remove();
@@ -139,6 +155,7 @@ movieForm.addEventListener('submit', event => {
     };
 
     movies.push(newMovie);
+    showToast();
 
     movieForm.reset();
     movieYear.value = "2026";
@@ -155,13 +172,13 @@ window.addEventListener('keydown', event => {
     }
 });
 
-searchInput.addEventListener('input', () => {
+searchInput.addEventListener('input', debounce(() => {
     const query = searchInput.value.toLowerCase();
     const filteredMovies = movies.filter(movie =>
         movie.title.toLowerCase().includes(query)
     );
     renderMovie(filteredMovies);
-});
+}, 400));
 
 movieList.addEventListener('click', event => {
     if (event.target.classList.contains('details-link')) {
@@ -184,4 +201,7 @@ movieList.addEventListener('click', event => {
     }
 });
 
-renderMovie();
+movieList.textContent = "Завантаження...";
+setTimeout(() => {
+    renderMovie();
+}, 1000);
