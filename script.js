@@ -2,7 +2,11 @@ import defaultMovies from './movies.js';
 import { generateId, formatMovie } from './helpers.js';
 import { isValidYear } from './validation.js';
 
-let movies = defaultMovies;
+if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+}
+
+let movies = JSON.parse(localStorage.getItem('movies')) || defaultMovies;
 
 const heading = document.querySelector('h1');
 const movieList = document.getElementById('movie-list');
@@ -25,6 +29,10 @@ const toast = document.getElementById('toast');
 
 function markWatched(card) {
     card.classList.toggle('watched');
+}
+
+function saveToLocalStorage() {
+    localStorage.setItem('movies', JSON.stringify(movies));
 }
 
 function updateCounters() {
@@ -73,6 +81,11 @@ function renderMovie(moviesToRender = movies) {
     movieList.replaceChildren();
     updateCounters();
 
+    if (moviesToRender.length === 0) {
+        movieList.textContent = "Список порожній, додай перший фільм";
+        return;
+    }
+
     moviesToRender.forEach(movie => {
         const card = createMovieCard(movie);
         movieList.appendChild(card);
@@ -82,11 +95,17 @@ function renderMovie(moviesToRender = movies) {
 function clearList() {
     movies = [];
     searchInput.value = "";
+    saveToLocalStorage();
     renderMovie();
 }
 
 function toggleTheme() {
-    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.toggle('dark');
+    if (isDark) {
+        localStorage.setItem('theme', 'dark');
+    } else {
+        localStorage.setItem('theme', 'light');
+    }
 }
 
 function showMovieDetails(id) {
@@ -107,7 +126,13 @@ function debounce(fn, delay) {
 function deleteMovie(card, id) {
     movies = movies.filter(movie => movie.id !== id);
     card.remove();
-    updateCounters();
+    saveToLocalStorage();
+
+    if (movies.length === 0) {
+        renderMovie();
+    } else {
+        updateCounters();
+    }
 }
 
 function toggleMovieWatched(card, id) {
@@ -117,6 +142,7 @@ function toggleMovieWatched(card, id) {
         }
     });
     markWatched(card);
+    saveToLocalStorage();
     updateCounters();
 }
 
@@ -155,6 +181,7 @@ movieForm.addEventListener('submit', event => {
     };
 
     movies.push(newMovie);
+    saveToLocalStorage();
     showToast();
 
     movieForm.reset();
