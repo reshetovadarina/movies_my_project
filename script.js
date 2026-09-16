@@ -1,12 +1,19 @@
 import defaultMovies from './movies.js';
 import { generateId, formatMovie } from './helpers.js';
-import { isValidYear } from './validation.js';
+import { isValidYear, isDuplicateMovie } from './validation.js';
 
 if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark');
 }
 
-let movies = JSON.parse(localStorage.getItem('movies')) || defaultMovies;
+let movies;
+
+try {
+    movies = JSON.parse(localStorage.getItem('movies')) || defaultMovies;
+} catch (error) {
+    console.error("Дані пошкоджені, повернено порожній масив фільмів.", error);
+    movies = [];
+}
 
 const heading = document.querySelector('h1');
 const movieList = document.getElementById('movie-list');
@@ -165,6 +172,11 @@ movieForm.addEventListener('submit', event => {
 
     if (!movieYear.value || !isValidYear(yearValue)) {
         yearError.textContent = "Рік має бути в діапазоні від 1900 до " + currentYear;
+        isFormValid = false;
+    }
+
+    if (isFormValid && isDuplicateMovie(movies, titleText, yearValue)) {
+        titleError.textContent = "Такий фільм вже є у вашому списку";
         isFormValid = false;
     }
 
