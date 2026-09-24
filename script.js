@@ -2,6 +2,14 @@ import defaultMovies from './movies.js';
 import { generateId, formatMovie } from './helpers.js';
 import { isValidYear, isDuplicateMovie } from './validation.js';
 
+const DELAY_SLOW_FETCH = 2000;
+const DELAY_FAST_FETCH = 500;
+const DELAY_TOAST = 2000;
+const DELAY_DEBOUNCE = 400;
+const DEFAULT_FORM_YEAR = "2026";
+const START_VALID_YEAR = 1900;
+
+
 if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark');
 }
@@ -29,9 +37,8 @@ const toast = document.getElementById('toast');
 
 function getMoviesSlow() {
     return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(defaultMovies);
-        }, 2000);
+        const data = (typeof defaultMovies !== 'undefined' && defaultMovies.length > 0) ? defaultMovies : backupMovies;
+        setTimeout(() => resolve(data), DELAY_SLOW_FETCH);
     });
 }
 
@@ -42,7 +49,7 @@ function getMoviesFast() {
                 { id: 101, title: "Матриця (з кешу)", year: 1999, genre: "Фантастика", watched: false },
                 { id: 102, title: "Дюна (з кешу)", year: 2021, genre: "Фантастика", watched: true }
             ]);
-        }, 500);
+        }, DELAY_FAST_FETCH);
     });
 }
 
@@ -67,31 +74,33 @@ function showToast() {
     toast.textContent = "Фільм додано";
     setTimeout(() => {
         toast.textContent = "";
-    }, 2000);
+    }, DELAY_TOAST);
 }
 
 function createMovieCard(movie) {
     const li = document.createElement('li');
     li.setAttribute('data-id', movie.id);
 
-    const textSpan = document.createElement('span');
-    textSpan.textContent = formatMovie(movie) + " [" + movie.genre + "] ";
-    li.appendChild(textSpan);
-
     if (movie.watched) {
         li.classList.add('watched');
     }
 
+    const textSpan = document.createElement('span');
+    textSpan.className = 'movie-title';
+    textSpan.textContent = formatMovie(movie) + " [" + movie.genre + "] ";
+    li.appendChild(textSpan);
+
     const actionsDiv = document.createElement('div');
-    actionsDiv.style.display = "inline-block";
-    actionsDiv.style.marginLeft = "15px";
+    actionsDiv.className = 'movie-actions';
 
     const watchBtn = document.createElement('button');
     watchBtn.textContent = "Переглянуто";
+    watchBtn.type = "button";
     watchBtn.classList.add('watched-btn');
 
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = "Видалити";
+    deleteBtn.type = "button";
     deleteBtn.classList.add('delete-btn');
 
     const detailsLink = document.createElement('a');
@@ -102,8 +111,8 @@ function createMovieCard(movie) {
     actionsDiv.appendChild(watchBtn);
     actionsDiv.appendChild(deleteBtn);
     actionsDiv.appendChild(detailsLink);
-    li.appendChild(actionsDiv);
 
+    li.appendChild(actionsDiv);
     return li;
 }
 
@@ -132,11 +141,7 @@ function clearList() {
 
 function toggleTheme() {
     const isDark = document.body.classList.toggle('dark');
-    if (isDark) {
-        localStorage.setItem('theme', 'dark');
-    } else {
-        localStorage.setItem('theme', 'light');
-    }
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
 }
 
 function showMovieDetails(id) {
@@ -177,35 +182,41 @@ function toggleMovieWatched(card, id) {
     updateCounters();
 }
 
+function validateMovieForm(titleText, yearValue, yearRawValue) {
+    if (titleError) titleError.textContent = "";
+    if (yearError) yearError.textContent = "";
+
+    const currentYear = new Date().getFullYear();
+    let isValid = true;
+
+    if (titleText === "") {
+        if (titleError) titleError.textContent = "Назва фільму не може бути порожньою";
+        isValid = false;
+    }
+
+    if (!yearRawValue || !isValidYear(yearValue)) {
+        if (yearError) yearError.textContent = `Рік має бути в діапазоні від ${START_VALID_YEAR} до ${currentYear}`;
+        isValid = false;
+    }
+
+    if (isValid && isDuplicateMovie(movies, titleText, yearValue)) {
+        if (titleError) titleError.textContent = "Такий фільм вже є у вашому списку";
+        isValid = false;
+    }
+
+    return isValid;
+}
+
 if (movieForm) {
     movieForm.addEventListener('submit', event => {
         event.preventDefault();
 
         const titleText = movieInput.value.trim();
         const yearValue = Number(movieYear.value);
-        const currentYear = new Date().getFullYear();
 
-        if (titleError) titleError.textContent = "";
-        if (yearError) yearError.textContent = "";
-
-        let isFormValid = true;
-
-        if (titleText === "") {
-            if (titleError) titleError.textContent = "Назва фільму не може бути порожньою";
-            isFormValid = false;
+        if (!validateMovieForm(titleText, yearValue, movieYear.value)) {
+            return;
         }
-
-        if (!movieYear.value || !isValidYear(yearValue)) {
-            if (yearError) yearError.textContent = "Рік має бути в діапазоні від 1900 до " + currentYear;
-            isFormValid = false;
-        }
-
-        if (isFormValid && isDuplicateMovie(movies, titleText, yearValue)) {
-            if (titleError) titleError.textContent = "Такий фільм вже є у вашому списку";
-            isFormValid = false;
-        }
-
-        if (!isFormValid) return;
 
         const newMovie = {
             id: generateId(),
@@ -220,7 +231,7 @@ if (movieForm) {
         showToast();
 
         movieForm.reset();
-        if (movieYear) movieYear.value = "2026";
+        if (movieYear) movieYear.value = DEFAULT_FORM_YEAR;
         if (searchInput) searchInput.value = "";
         renderMovie();
     });
@@ -242,7 +253,7 @@ if (searchInput) {
             movie.title.toLowerCase().includes(query)
         );
         renderMovie(filteredMovies);
-    }, 400));
+    }, DELAY_DEBOUNCE));
 }
 
 if (movieList) {
@@ -271,32 +282,25 @@ async function initWishlistAsync() {
     try {
         const localData = localStorage.getItem('movies');
 
-        if (localData) {
+        if (localData && localData !== "[]") {
             movies = JSON.parse(localData);
-        } else {
-            movies = await Promise.race([getMoviesSlow(), getMoviesFast()]);
-            saveToLocalStorage();
+            return;
         }
 
-        renderMovie();
-        console.log("Дані успішно відрендерено через async/await!");
+        console.log("Завантаження оригінальних фільмів з movies.js...");
+
+        const data = await getMoviesSlow();
+
+
+        movies = data || [];
+
     } catch (error) {
-        console.error("Помилка в async/await:", error);
-        if (movieList) {
-            movieList.textContent = "Не вдалося завантажити фільми. Спробуйте пізніше!";
-        }
+        console.error("Помилка завантаження оригінального модуля movies.js:", error);
+        movies = [];
+    } finally {
+        saveToLocalStorage();
+        renderMovie();
     }
 }
 
-function testLoadingWithThen() {
-    Promise.race([getMoviesSlow(), getMoviesFast()])
-        .then((data) => {
-            console.log("Дані паралельно успішно отримано через .then():", data);
-        })
-        .catch((error) => {
-            console.error("Помилка перехоплена через .catch():", error);
-        });
-}
-
 initWishlistAsync();
-testLoadingWithThen();
