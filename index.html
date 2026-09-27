@@ -49,6 +49,18 @@
         placeholder="Швидкий пошук фільму..."
       />
       <button id="clear-button">Очистити список</button>
+      <div id="omdb-search-section">
+        <h3>Пошук у світовій базі (OMDb)</h3>
+        <div class="omdb-search-group">
+          <input
+            type="text"
+            id="omdb-input"
+            placeholder="Введіть назву англійською (напр. Interstellar)..."
+          />
+          <button type="button" id="omdb-search-btn">Пошук</button>
+        </div>
+        <div id="omdb-card-result"></div>
+      </div>
 
       <p id="search-result" class="search-info"></p>
       <p id="toast" class="toast-message"></p>

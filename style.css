@@ -166,7 +166,6 @@ label {
   display: none;
 }
 
-/* СТИЛІ ДЛЯ СЕКЦІЇ ПОШУКУ В OMDB */
 #omdb-search-section {
   margin-top: 25px;
 }
@@ -209,7 +208,6 @@ label {
   font-weight: 500;
 }
 
-/* СТИЛІ ДЛЯ КАРТКИ РЕЗУЛЬТАТУ OMDB (Тут прибрано інлайн-стилі з JS) */
 .omdb-result-card {
   background: #ffffff;
   border: 1px solid #ced4da;
@@ -347,7 +345,80 @@ label {
   color: #6c757d !important;
 }
 
-/* ТЕМНА ТЕМА */
+#omdb-search-section {
+  margin-top: 25px;
+}
+
+.omdb-search-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.omdb-search-group input {
+  margin-top: 0;
+  width: 100%;
+}
+
+#omdb-search-btn {
+  width: auto;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#omdb-search-btn:hover {
+  background-color: #0056b3;
+}
+
+.omdb-inline-card {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background-color: #e9ecef;
+  border-radius: 6px;
+  margin-top: 15px;
+  color: #333333;
+  text-align: left;
+  border: 1px solid #ced4da;
+}
+
+.omdb-inline-card img {
+  max-width: 70px;
+  border-radius: 4px;
+  margin-right: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.omdb-inline-card div {
+  display: flex;
+  flex-direction: column;
+}
+
+.omdb-inline-card strong {
+  font-size: 1.05rem;
+  margin-bottom: 2px;
+}
+
+.omdb-inline-card span {
+  font-size: 0.9rem;
+  color: #555555;
+}
+
+body.dark .omdb-inline-card {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  border-color: #444444;
+}
+
+body.dark .omdb-inline-card span {
+  color: #aaaaaa;
+}
+
 body.dark {
   background-color: #121212;
   color: #e0e0e0;

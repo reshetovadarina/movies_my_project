@@ -33,7 +33,11 @@ const themeButton = document.getElementById('theme-button');
 const counter = document.getElementById('counter');
 const searchResult = document.getElementById('search-result');
 const toast = document.getElementById('toast');
-
+const omdbInput = document.getElementById('omdb-input');
+const omdbSearchBtn = document.getElementById('omdb-search-btn');
+const omdbCardResult = document.getElementById('omdb-card-result');
+const omdbLoading = document.getElementById('omdb-loading');
+const omdbError = document.getElementById('omdb-error');
 function getMoviesSlow() {
     return new Promise((resolve) => {
         const data = (typeof defaultMovies !== 'undefined' && defaultMovies.length > 0) ? defaultMovies : [];
@@ -143,7 +147,6 @@ function toggleTheme() {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
 }
 
-// МИНУЛА РОБОЧА ФУНКЦІЯ: Робить fetch для Inception і виводить об'єкт у консоль
 function showMovieDetails(id) {
     const currentMovie = movies.find(movie => movie.id === id);
     if (currentMovie && searchResult) {
@@ -151,8 +154,8 @@ function showMovieDetails(id) {
 
         const baseEndpoint = 'https://omdbapi.com';
         const apiParams = new URLSearchParams();
-        apiParams.append('apikey', '50cf6874'); // Ваш робочий ключ
-        apiParams.append('t', 'Inception');       // Назва за завданням
+        apiParams.append('apikey', '50cf6874');
+        apiParams.append('t', 'Inception');
 
         const url = baseEndpoint + '?' + apiParams.toString();
 
@@ -166,10 +169,10 @@ function showMovieDetails(id) {
                 return response.json();
             })
             .then(data => {
-                console.log("=== ДАНІ ФІЛЬМУ INCEPTION З OMDB API УСПІШНО ОТРИМАНО ===");
-                console.log(data); // Виведення у консоль
+                console.log("ДАНІ ФІЛЬМУ INCEPTION З OMDB API УСПІШНО ОТРИМАНО");
+                console.log(data);
             })
-            .catch(error => console.error("Помилка під час запиту до OMDb API:", error));
+            .catch(error => console.error("Помилка під час запиту:", error));
     }
 }
 
@@ -297,8 +300,115 @@ if (movieList) {
         }
     });
 }
+async function searchMovieInOMDbAsync() {
+    const queryTitle = omdbInput.value.trim();
 
-// === ІНІЦІАЛІЗАЦІЯ СТАРТУ ДОДАТКУ ===
+    if (!queryTitle) {
+        if (omdbCardResult) {
+            omdbCardResult.replaceChildren();
+            const errorPara = document.createElement('p');
+            errorPara.className = 'omdb-status-error';
+            errorPara.textContent = "Будь ласка, введіть назву фільму для пошуку.";
+            omdbCardResult.appendChild(errorPara);
+        }
+        return;
+    }
+
+    if (omdbCardResult) {
+        omdbCardResult.replaceChildren();
+        const loadingPara = document.createElement('p');
+        loadingPara.className = 'omdb-status-loading';
+        loadingPara.textContent = "Завантаження...";
+        omdbCardResult.appendChild(loadingPara);
+    }
+
+    try {
+        const baseEndpoint = 'https://omdbapi.com';
+        const apiParams = new URLSearchParams();
+        apiParams.append('apikey', '50cf6874');
+        apiParams.append('t', queryTitle);
+
+        const url = baseEndpoint + '?' + apiParams.toString();
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`Помилка сервера: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.Response === "False") {
+            throw new Error(data.Error || "Фільм не знайдено.");
+        }
+
+        const card = document.createElement('div');
+        card.className = 'omdb-inline-card';
+
+        const hasPoster = data.Poster && data.Poster !== 'N/A';
+        const posterHtml = hasPoster ? '<img src="' + data.Poster + '" alt="' + data.Title + '">' : '';
+
+        card.innerHTML =
+            posterHtml +
+            '<div>' +
+                '<strong>' + data.Title + '</strong>' +
+                '<span>Рік випуску: ' + data.Year + '</span>' +
+                '<button type="button" id="omdb-add-wishlist-btn">Додати у вішліст</button>' +
+            '</div>';
+
+        omdbCardResult.appendChild(card);
+
+        const addWishlistBtn = document.getElementById('omdb-add-wishlist-btn');
+        if (addWishlistBtn) {
+            addWishlistBtn.addEventListener('click', () => {
+                const cleanYear = parseInt(data.Year) || 2026;
+                const cleanGenre = data.Genre ? data.Genre.split(',')[0].trim() : "Фантастика";
+
+                if (isDuplicateMovie(movies, data.Title, cleanYear)) {
+                    alert("Цей фільм вже є у вашому списку!");
+                    return;
+                }
+
+                const apiNewMovie = {
+                    id: generateId(),
+                    title: data.Title,
+                    year: cleanYear,
+                    genre: cleanGenre,
+                    watched: false
+                };
+
+                movies.push(apiNewMovie);
+                saveToLocalStorage();
+                showToast();
+                renderMovie();
+
+                omdbInput.value = "";
+                omdbCardResult.replaceChildren();
+            });
+        }
+
+    } catch (error) {
+        if (omdbCardResult) {
+            omdbCardResult.replaceChildren();
+            const errorPara = document.createElement('p');
+            errorPara.className = 'omdb-status-error';
+            errorPara.textContent = "Не вдалося знайти фільм. Причина: " + error.message;
+            omdbCardResult.appendChild(errorPara);
+        }
+    }
+}
+
+if (omdbSearchBtn) {
+    omdbSearchBtn.addEventListener('click', searchMovieInOMDbAsync);
+}
+if (omdbInput) {
+    omdbInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchMovieInOMDbAsync();
+        }
+    });
+}
+
 if (movieList) movieList.textContent = "Завантаження...";
 
 async function initWishlistAsync() {
