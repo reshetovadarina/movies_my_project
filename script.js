@@ -9,7 +9,6 @@ const DELAY_DEBOUNCE = 400;
 const DEFAULT_FORM_YEAR = "2026";
 const START_VALID_YEAR = 1900;
 
-
 if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark');
 }
@@ -37,7 +36,7 @@ const toast = document.getElementById('toast');
 
 function getMoviesSlow() {
     return new Promise((resolve) => {
-        const data = (typeof defaultMovies !== 'undefined' && defaultMovies.length > 0) ? defaultMovies : backupMovies;
+        const data = (typeof defaultMovies !== 'undefined' && defaultMovies.length > 0) ? defaultMovies : [];
         setTimeout(() => resolve(data), DELAY_SLOW_FETCH);
     });
 }
@@ -144,10 +143,33 @@ function toggleTheme() {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
 }
 
+// МИНУЛА РОБОЧА ФУНКЦІЯ: Робить fetch для Inception і виводить об'єкт у консоль
 function showMovieDetails(id) {
     const currentMovie = movies.find(movie => movie.id === id);
     if (currentMovie && searchResult) {
         searchResult.textContent = `ID: ${currentMovie.id} | Назва: ${currentMovie.title} | Рік: ${currentMovie.year} | Жанр: ${currentMovie.genre} | Статус: ${currentMovie.watched ? "Переглянуто" : "Ще ні"}`;
+
+        const baseEndpoint = 'https://omdbapi.com';
+        const apiParams = new URLSearchParams();
+        apiParams.append('apikey', '50cf6874'); // Ваш робочий ключ
+        apiParams.append('t', 'Inception');       // Назва за завданням
+
+        const url = baseEndpoint + '?' + apiParams.toString();
+
+        console.log("ЗАПИТ НАДСИЛАЄТЬСЯ НА АДРЕСУ:", url);
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Помилка сервера: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("=== ДАНІ ФІЛЬМУ INCEPTION З OMDB API УСПІШНО ОТРИМАНО ===");
+                console.log(data); // Виведення у консоль
+            })
+            .catch(error => console.error("Помилка під час запиту до OMDb API:", error));
     }
 }
 
@@ -276,22 +298,20 @@ if (movieList) {
     });
 }
 
+// === ІНІЦІАЛІЗАЦІЯ СТАРТУ ДОДАТКУ ===
 if (movieList) movieList.textContent = "Завантаження...";
 
 async function initWishlistAsync() {
     try {
         const localData = localStorage.getItem('movies');
 
-        if (localData && localData !== "[]") {
+        if (localData && localData !== "[]" && localData !== null) {
             movies = JSON.parse(localData);
             return;
         }
 
         console.log("Завантаження оригінальних фільмів з movies.js...");
-
         const data = await getMoviesSlow();
-
-
         movies = data || [];
 
     } catch (error) {
