@@ -171,6 +171,15 @@ async function searchMovieInOMDbAsync() {
 
 if (omdbSearchBtn) omdbSearchBtn.addEventListener('click', searchMovieInOMDbAsync);
 
+if (omdbInput) {
+    omdbInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            searchMovieInOMDbAsync();
+        }
+    });
+}
+
 if (clearButton) {
     clearButton.addEventListener('click', () => {
         setMovies([]);
