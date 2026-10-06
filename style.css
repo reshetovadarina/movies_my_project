@@ -1,3 +1,5 @@
+@import url("https://googleapis.com");
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -15,6 +17,14 @@ body {
   padding: 40px 20px;
   max-width: 600px;
   margin: 0 auto;
+}
+
+h1,
+h3,
+h4 {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  color: #1a1a1a;
 }
 
 h1 {
@@ -40,7 +50,8 @@ h1 {
   border-radius: 20px;
   font-size: 0.85rem;
   cursor: pointer;
-  font-weight: 500;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
 }
 
 #theme-button:hover {
@@ -84,6 +95,20 @@ label {
   margin: 12px 0;
   font-size: 0.95rem;
   cursor: pointer;
+}
+#add-button,
+#clear-button,
+#omdb-search-btn,
+#omdb-add-wishlist-btn {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+}
+
+.watched-btn,
+.delete-btn,
+.details-link {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 500;
 }
 
 #add-button,
@@ -274,7 +299,6 @@ label {
   background-color: #8c205c;
 }
 
-/* ГОЛОВНИЙ СПИСОК */
 #movie-list {
   padding: 0;
   margin-top: 10px;
