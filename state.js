@@ -22,22 +22,31 @@ function getMoviesSlow() {
         setTimeout(() => resolve(data), DELAY_SLOW_FETCH);
     });
 }
+
 export async function initMovies() {
-    // 🔥 ВІДНОВЛЕННЯ ТЕМИ: Перевіряємо сховище та миттєво вмикаємо темний режим, якщо він був збережений
     if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark');
     }
 
-    const localData = localStorage.getItem('movies');
+    try {
+        const localData = localStorage.getItem('movies');
 
-    if (localData && localData !== "[]" && localData !== null) {
-        movies = JSON.parse(localData);
+        if (localData && localData !== "[]" && localData !== null) {
+            movies = JSON.parse(localData);
+            return movies;
+        }
+
+        console.log("Завантаження оригінальних фільмів з movies.js...");
+        const data = await getMoviesSlow();
+        movies = data || [];
+        saveToLocalStorage();
+        return movies;
+
+    } catch (error) {
+        console.error("Помилка ініціалізації або пошкоджений JSON в localStorage:", error);
+
+        movies = defaultMovies || [];
+        saveToLocalStorage();
         return movies;
     }
-
-    console.log("Завантаження оригінальних фільмів з movies.js...");
-    const data = await getMoviesSlow();
-    movies = data || [];
-    saveToLocalStorage();
-    return movies;
 }
