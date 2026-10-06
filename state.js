@@ -22,8 +22,12 @@ function getMoviesSlow() {
         setTimeout(() => resolve(data), DELAY_SLOW_FETCH);
     });
 }
-
 export async function initMovies() {
+    // 🔥 ВІДНОВЛЕННЯ ТЕМИ: Перевіряємо сховище та миттєво вмикаємо темний режим, якщо він був збережений
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark');
+    }
+
     const localData = localStorage.getItem('movies');
 
     if (localData && localData !== "[]" && localData !== null) {
