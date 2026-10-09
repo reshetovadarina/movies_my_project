@@ -88,12 +88,19 @@ if (movieList) {
         }
         else if (event.target.classList.contains('details-link')) {
             event.preventDefault();
+            const clickedId = Number(parentLi.getAttribute('data-id'));
             const currentMovie = getMovies().find(m => m.id === clickedId);
+
             if (currentMovie && searchResult) {
                 searchResult.textContent = `ID: ${currentMovie.id} | Назва: ${currentMovie.title} | Рік: ${currentMovie.year} | Жанр: ${currentMovie.genre} | Статус: ${currentMovie.watched ? "Переглянуто" : "Ще ні"}`;
-                fetchMovieFromOMDb('Inception')
-                    .then(data => console.log("Дані фільму Inception:", data))
-                    .catch(err => console.error(err));
+
+                console.log(`Надсилаю запит до OMDb API для реального фільму: "${currentMovie.title}"`);
+                fetchMovieFromOMDb(currentMovie.title)
+                    .then(data => {
+                        console.log(` ДАНІ ФІЛЬМУ "${currentMovie.title}" УСПІШНО ОТРИМАНО`);
+                        console.log(data);
+                    })
+                    .catch(err => console.error("Помилка під час детального запиту:", err));
             }
         }
     });
