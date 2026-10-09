@@ -1,6 +1,9 @@
+export const START_VALID_YEAR = 1900;
+export const DEFAULT_FORM_YEAR = 2026;
+
 export function isValidYear(year) {
     const currentYear = new Date().getFullYear();
-    return year >= 1900 && year <= currentYear;
+    return year >= START_VALID_YEAR && year <= currentYear;
 }
 
 export function isDuplicateMovie(moviesList, title, year) {
@@ -11,7 +14,6 @@ export function isDuplicateMovie(moviesList, title, year) {
 
 export function validateMovieForm(moviesList, titleText, yearValue, yearRawValue) {
     const currentYear = new Date().getFullYear();
-    const START_VALID_YEAR = 1900;
 
     if (titleText === "") {
         return { isValid: false, errorType: 'title', message: "Назва фільму не може бути порожньою" };

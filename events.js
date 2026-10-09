@@ -1,9 +1,11 @@
 import { getMovies, setMovies, saveToLocalStorage, initMovies, addMovie } from './state.js';
+import { DEFAULT_FORM_YEAR } from './validation.js';
 import { validateMovieForm } from './validation.js';
 import { renderMovie, showToast, updateCounters } from './render.js';
 import { generateId, debounce } from './helpers.js';
 import { fetchMovieFromOMDb } from './api.js';
 
+const DEBOUNCE_DELAY = 400;
 const movieForm = document.getElementById('movie-form');
 const movieInput = document.getElementById('movie-input');
 const movieYear = document.getElementById('movie-year');
@@ -51,7 +53,7 @@ if (movieForm) {
         showToast();
         movieForm.reset();
 
-        if (movieYear) movieYear.value = "2026";
+       if (movieYear) movieYear.value = String(DEFAULT_FORM_YEAR);
         if (searchInput) searchInput.value = "";
         renderMovie();
     });
@@ -62,7 +64,7 @@ if (searchInput) {
         const query = searchInput.value.toLowerCase();
         const filtered = getMovies().filter(m => m.title.toLowerCase().includes(query));
         renderMovie(filtered);
-    }, 400));
+    }, DEBOUNCE_DELAY));
 }
 
 if (movieList) {
@@ -166,7 +168,7 @@ async function searchMovieInOMDbAsync() {
         omdbCardResult.appendChild(card);
 
         addBtn.addEventListener('click', () => {
-            const cleanYear = parseInt(data.Year) || 2026;
+            const cleanYear = parseInt(data.Year) || DEFAULT_FORM_YEAR;
             const cleanGenre = data.Genre ? data.Genre.split(',')[0].trim() : "Фантастика";
 
             const apiNewMovie = { id: generateId(), title: data.Title, year: cleanYear, genre: cleanGenre, watched: false };

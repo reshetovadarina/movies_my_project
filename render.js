@@ -1,6 +1,7 @@
 import { formatMovie } from './helpers.js';
 import { getMovies } from './state.js';
 
+const TOAST_DELAY = 2000;
 const heading = document.querySelector('h1');
 const counter = document.getElementById('counter');
 const movieList = document.getElementById('movie-list');
@@ -18,7 +19,7 @@ export function updateCounters() {
 export function showToast(text = "Фільм додано") {
     if (!toast) return;
     toast.textContent = text;
-    setTimeout(() => { toast.textContent = ""; }, 2000);
+    setTimeout(() => { toast.textContent = ""; }, TOAST_DELAY);
 }
 
 export function createMovieCard(movie) {
