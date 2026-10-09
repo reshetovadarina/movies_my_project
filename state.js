@@ -50,3 +50,8 @@ export async function initMovies() {
         return movies;
     }
 }
+
+export function addMovie(newMovie) {
+    movies.push(newMovie);
+    saveToLocalStorage();
+}

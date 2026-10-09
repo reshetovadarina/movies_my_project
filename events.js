@@ -1,4 +1,4 @@
-import { getMovies, setMovies, saveToLocalStorage, initMovies } from './state.js';
+import { getMovies, setMovies, saveToLocalStorage, initMovies, addMovie } from './state.js';
 import { validateMovieForm } from './validation.js';
 import { renderMovie, showToast, updateCounters } from './render.js';
 import { generateId, debounce } from './helpers.js';
@@ -47,11 +47,10 @@ if (movieForm) {
             watched: movieWatched.checked
         };
 
-        getMovies().push(newMovie);
-        saveToLocalStorage();
+        addMovie(newMovie);
         showToast();
-
         movieForm.reset();
+
         if (movieYear) movieYear.value = "2026";
         if (searchInput) searchInput.value = "";
         renderMovie();
@@ -171,8 +170,7 @@ async function searchMovieInOMDbAsync() {
             const cleanGenre = data.Genre ? data.Genre.split(',')[0].trim() : "Фантастика";
 
             const apiNewMovie = { id: generateId(), title: data.Title, year: cleanYear, genre: cleanGenre, watched: false };
-            getMovies().push(apiNewMovie);
-            saveToLocalStorage();
+            addMovie(apiNewMovie);
             showToast();
             renderMovie();
 
