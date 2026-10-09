@@ -35,13 +35,12 @@ export async function initMovies() {
         console.log("Завантаження оригінальних фільмів з movies.js...");
         const data = await getMoviesSlow();
         movies = data || [];
-        saveToLocalStorage();
-        return movies;
 
     } catch (error) {
         console.error("Помилка ініціалізації або пошкоджений JSON в localStorage:", error);
-
         movies = defaultMovies || [];
+
+    } finally {
         saveToLocalStorage();
         return movies;
     }
