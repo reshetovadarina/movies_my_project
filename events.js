@@ -136,22 +136,37 @@ async function searchMovieInOMDbAsync() {
         }
 
         omdbCardResult.replaceChildren();
+
         const card = document.createElement('div');
         card.className = 'omdb-inline-card';
+        if (data.Poster && data.Poster !== 'N/A') {
+            const img = document.createElement('img');
+            img.src = data.Poster;
+            img.alt = data.Title;
+            card.appendChild(img);
 
-        const posterHtml = data.Poster && data.Poster !== 'N/A' ? '<img src="' + data.Poster + '" alt="' + data.Title + '">' : '';
+        const infoDiv = document.createElement('div');
 
-        card.innerHTML =
-            posterHtml +
-            '<div>' +
-                '<strong>' + data.Title + '</strong>' +
-                '<span>Рік випуску: ' + data.Year + '</span>' +
-                '<button type="button" id="omdb-add-wishlist-btn">Додати у вішліст</button>' +
-            '</div>';
+        const titleStrong = document.createElement('strong');
+        titleStrong.textContent = data.Title;
 
+        const yearSpan = document.createElement('span');
+        yearSpan.textContent = 'Рік випуску: ' + data.Year;
+
+
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.id = 'omdb-add-wishlist-btn';
+        addBtn.textContent = 'Додати у вішліст';
+
+        infoDiv.appendChild(titleStrong);
+        infoDiv.appendChild(yearSpan);
+        infoDiv.appendChild(addBtn);
+
+        card.appendChild(infoDiv);
         omdbCardResult.appendChild(card);
 
-        document.getElementById('omdb-add-wishlist-btn').addEventListener('click', () => {
+        addBtn.addEventListener('click', () => {
             const cleanYear = parseInt(data.Year) || 2026;
             const cleanGenre = data.Genre ? data.Genre.split(',')[0].trim() : "Фантастика";
 
@@ -164,8 +179,8 @@ async function searchMovieInOMDbAsync() {
             omdbInput.value = "";
             omdbCardResult.replaceChildren();
         });
-
-    } catch (error) {
+        }}
+ catch (error) {
         if (omdbCardResult) {
             omdbCardResult.replaceChildren();
             const p = document.createElement('p');
