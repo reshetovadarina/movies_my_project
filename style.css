@@ -510,3 +510,204 @@ body.dark #movie-list li.watched {
 body.dark #movie-list li.watched span.movie-title {
   color: #888888 !important;
 }
+
+body.dark .watched-btn:hover {
+  background-color: #aa2c71;
+  color: #ffffff !important;
+  border-color: #aa2c71;
+}
+
+body.dark .delete-btn:hover {
+  background-color: #dc3545;
+  color: #ffffff !important;
+  border-color: #dc3545;
+}
+
+body.dark .details-link:hover {
+  background-color: #007bff;
+  color: #ffffff !important;
+  border-color: #007bff;
+}
+
+body.dark #clear-button:hover {
+  background-color: #495057;
+  border-color: #495057;
+}
+
+#movie-list li,
+.omdb-inline-card {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+#movie-list li:hover,
+.omdb-inline-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+#add-button,
+#omdb-search-btn,
+#omdb-add-wishlist-btn {
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+}
+
+#add-button:active,
+#omdb-search-btn:active,
+#omdb-add-wishlist-btn:active {
+  transform: scale(0.98);
+}
+
+.watched-btn,
+.delete-btn,
+.details-link {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.watched-btn:hover {
+  background-color: #aa2c71;
+  color: #ffffff;
+  border-color: #aa2c71;
+}
+
+.details-link:hover {
+  background-color: #007bff;
+  color: #ffffff !important;
+  border-color: #007bff;
+}
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f3f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ced4da;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6c757d;
+}
+
+body.dark ::webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+body.dark ::webkit-scrollbar-thumb {
+  background: #444444;
+}
+body.dark ::webkit-scrollbar-thumb:hover {
+  background: #6c757d;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 20px 12px;
+  }
+
+  #theme-button {
+    position: static;
+    display: block;
+    margin: 0 0 20px auto;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  #counter {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  #movie-form {
+    padding: 15px;
+  }
+
+  #search-input {
+    width: 100%;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  #clear-button {
+    width: 100%;
+    margin-left: 0;
+    display: block;
+  }
+
+  .omdb-search-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  #omdb-search-btn {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .omdb-inline-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .omdb-inline-card img {
+    margin-right: 0;
+    max-width: 100px;
+  }
+
+  .omdb-inline-card div {
+    align-items: center;
+    width: 100%;
+  }
+
+  #omdb-add-wishlist-btn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+  }
+
+  #movie-list li {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px;
+    align-items: center;
+  }
+
+  #movie-list li span.movie-title {
+    flex: 1 1 100%;
+    text-align: left;
+    word-break: break-word;
+  }
+
+  .movie-actions {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .watched-btn,
+  .delete-btn,
+  .details-link {
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+}
